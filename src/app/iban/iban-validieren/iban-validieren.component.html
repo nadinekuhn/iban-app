@@ -1,0 +1,42 @@
+<div class="min-h-screen flex flex-col items-center bg-gray-100 p-4">
+    <!-- Header -->
+    <h1 class="text-4xl font-bold text-gray-800 mb-2">IBAN Validator</h1>
+    <p class="text-gray-600 mb-6">Prüfe schnell und einfach, ob deine IBAN gültig ist.</p>
+
+    <!-- Eingabefeld -->
+    <div class="w-full max-w-md flex bg-white rounded-lg shadow-md p-4">
+        <input
+                [value]="iban()"
+                (input)="onInput($event)"
+                type="text"
+                placeholder="Gib deine IBAN ein..."
+                class="w-full px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+        <button
+                (click)="validateIban()"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-r-md transition-all"
+                [disabled]="ibanService.loading()"
+        >
+            {{ ibanService.loading() ? 'Prüft...' : 'Validieren' }}
+        </button>
+    </div>
+
+    <!-- Ergebnisbereich -->
+    @if (ibanService.result() !== null && !ibanService.loading()) {
+        <div class="mt-6 w-full max-w-md bg-white p-4 rounded-lg shadow-md">
+            @if (ibanService.result()?.valid) {
+                <p class="text-green-600 font-semibold text-lg">✅ IBAN ist gültig!</p>
+                <p class="text-gray-700"><strong>Bank:</strong> {{ ibanService.result()?.bankData?.name }}</p>
+                <p class="text-gray-700"><strong>Stadt:</strong> {{ ibanService.result()?.bankData?.city }}</p>
+                <p class="text-gray-700"><strong>BIC:</strong> {{ ibanService.result()?.bankData?.bic }}</p>
+            } @else {
+                <p class="text-red-600 font-semibold text-lg">❌ Ungültige IBAN!</p>
+                @if (ibanService.result()?.checkResults?.bankCode) {
+                    <small>Bankleitzahl '{{ ibanService.result()?.bankData?.bankCode }}' ist korrekt! Der Fehler liegt an einer anderen Stelle.</small>
+                } @else {
+                    <small>Bankleitzahl ist ungültig!</small>
+                }
+            }
+        </div>
+    }
+</div>
